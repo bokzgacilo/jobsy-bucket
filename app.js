@@ -7,7 +7,7 @@ import fs from "fs";
 const app = express();
 
 const UPLOAD_DIR = "/var/www/cdn/assets";
-const BASE_URL = "https://cdn.bitezy.com/assets";
+const BASE_URL = "https://cdn.bitezy.online/assets";
 
 // Ensure folder exists
 if (!fs.existsSync(UPLOAD_DIR)) {
@@ -50,6 +50,12 @@ app.post("/upload", upload.single("image"), (req, res) => {
         success: true,
         url: publicUrl,
         filename: req.file.filename,
+    });
+});
+
+app.get("/", (req, res) => {
+    return res.status(404).json({
+        error: "Not Found"
     });
 });
 
