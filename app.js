@@ -5,10 +5,20 @@ import path from "path";
 import fs from "fs";
 import dotenv from "dotenv";
 import sharp from "sharp";
+import cors from "cors";
 
 dotenv.config();
 
 const app = express();
+
+app.use(cors({
+	origin: [
+		"http://localhost:5173", //WILL DELETE AFTER TESTING
+		"https://api.bitezy.online"
+	],
+	methods: ["POST", "GET"],
+	allowedHeaders: ["Content-Type", "x-service-key"],
+}));
 
 const PORT = process.env.PORT || 3020;
 const SERVICE_KEY = process.env.SERVICE_KEY;
