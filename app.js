@@ -36,13 +36,11 @@ const BASE_URL =
 
 fs.mkdirSync(BASE_UPLOAD_DIR, { recursive: true });
 
-
 function sanitizeMerchantId(id) {
 	if (!id) return null;
 	const clean = id.replace(/[^a-zA-Z0-9_-]/g, "");
 	return clean.length ? clean : null;
 }
-
 
 function validateServiceKey(req, res, next) {
 	const key = req.headers["x-service-key"];
@@ -59,8 +57,7 @@ function validateServiceKey(req, res, next) {
 const storage = multer.diskStorage({
 	destination: (req, file, cb) => {
 		console.log(req)
-		// const merchantId = sanitizeMerchantId(req.body.merchantId);
-		const merchantId = req.body.merchantId;
+		const merchantId = sanitizeMerchantId(req.body.merchantId);
 
 		if (!merchantId) {
 			return cb(new Error("Invalid merchantId"));
@@ -92,19 +89,21 @@ const upload = multer({
 	limits: { fileSize: 5 * 1024 * 1024 },
 });
 
+
+
 app.post(
 	"/upload",
+	// upload.none(),
 	validateServiceKey,
-	upload.single("image"),
-	async (req, res, next) => {
+	upload.single("file"),
+	async (req, res) => {
 		try {
+			console.log(req.file)
+
 			if (!req.file) {
 				return res.status(400).json({ error: "No file uploaded" });
 			}
-
 			const merchantId = req.merchantId;
-			console.log(merchantId)
-
 			const originalPath = req.file.path;
 			const webpName = uuidv4() + ".webp";
 			const webpPath = path.join(
@@ -115,14 +114,13 @@ app.post(
 
 			// Convert to WebP
 			await sharp(originalPath)
-				.webp({ quality: 82 })
+				.webp({ quality: 82 }) // lower quality = lower file
 				.toFile(webpPath);
 
 			// Remove original upload
 			fs.unlinkSync(originalPath);
 
-			const publicUrl =
-				`${BASE_URL}/${merchantId}/${webpName}`;
+			const publicUrl = `${BASE_URL}/${merchantId}/${webpName}`;
 
 			res.json({
 				success: true,
