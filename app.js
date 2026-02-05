@@ -14,6 +14,7 @@ const app = express();
 app.use(cors({
 	origin: [
 		"http://localhost:5173", //WILL DELETE AFTER TESTING
+		"http://localhost:3000", //WILL DELETE AFTER TESTING
 		"https://api.bitezy.online"
 	],
 	methods: ["POST", "GET"],
